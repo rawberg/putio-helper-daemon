@@ -1,0 +1,44 @@
+{
+    "author": "David Feinberg",
+    "name": "putio-helper",
+    "description": "Daemon",
+    "homepage": "https://github.com/rawberg/putio-helper-daemon",
+    "version": "1.0.0",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com:rawberg/putio-helper-daemon.git"
+    },
+
+    "bin": {
+        "putio-helper": "./daemon.js"
+    },
+
+    "bugs": {
+        "url": "https://github.com/rawberg/putio-helper-daemon/issues"
+    },
+
+    "engines": {
+        "node": "~0.8.0"
+    },
+
+    "preferGlobal": true,
+
+    "dependencies": {
+        "directory-watcher": "*",
+        "wrench": "*",
+        "config": "*",
+        "putio": "git://github.com/rawberg/put.io.js-v2.git"
+    },
+
+    "devDependencies": {
+        "mocha": "*",
+        "should": "*",
+        "sinon": "*",
+        "rewire": "*"
+    },
+
+    "licenses": [{
+        "type": "GPL v3",
+        "url": "http://opensource.org/licenses/gpl-3.0.html"
+    }]
+}
