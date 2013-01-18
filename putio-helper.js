@@ -4,15 +4,31 @@ var DirectoryWatcher = require('directory-watcher'),
     util = require('util'),
     fs = require('fs'),
     wrench = require('wrench'),
-    config = require('config');
+    config = require('config'),
+    FormData = require('form-data'),
+    S = require('string');
 
+var form;
 
 function _onFileAdded(files) {
+
     files.forEach(function (file, index, files) {
-        if(file.endsWith('.torrent')) {
-            console.log('valid torrent filed %s added \n', file);
+        if(S(file).endsWith('.torrent')) {
+            form = new FormData();
+            form.append('file', fs.createReadStream(config.watchDir + '/' + file));
+            form.submit({
+                method: 'POST',
+                protocol: 'https:',
+                port: '443',
+                hostname: 'api.put.io',
+                path: '/v2/files/upload?oauth_token=' + config.putioToken
+            }, function(err, res) {
+                console.log('error');
+                console.log(util.inspect(err));
+            });
         }
     });
+
 }
 
 var StartTorrentHelper = function() {

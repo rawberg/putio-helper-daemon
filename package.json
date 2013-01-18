@@ -2,19 +2,23 @@
     "author": "David Feinberg",
     "name": "putio-helper",
     "description": "Daemon",
-    "homepage": "https://github.com/rawberg/putio-helper-daemon",
+    "homepage": "https://github.com/rawberg/putio-helper",
     "version": "1.0.0",
     "repository": {
         "type": "git",
-        "url": "git://github.com:rawberg/putio-helper-daemon.git"
+        "url": "git://github.com:rawberg/putio-helper.git"
     },
 
     "bin": {
         "putio-helper": "./daemon.js"
     },
 
+    "scripts": {
+        "postinstall": "./postinstall.sh"
+    },
+
     "bugs": {
-        "url": "https://github.com/rawberg/putio-helper-daemon/issues"
+        "url": "https://github.com/rawberg/putio-helper/issues"
     },
 
     "engines": {

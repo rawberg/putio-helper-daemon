@@ -10,7 +10,6 @@ var should = require('should'),
     fork = require('child_process').fork,
     exec = require('child_process').exec;
 
-
 describe('Torrent Helper Specs\n', function() {
 
     describe('PutioHelper', function() {
@@ -24,7 +23,7 @@ describe('Torrent Helper Specs\n', function() {
                 if(fs.existsSync(testDefaultPath)) {
                     wrench.rmdirSyncRecursive(testDefaultPath);
                 }
-                thProcess = fork('./torrent-helper.js', [], {silent: false, env: {'HOME': '/tmp'}});
+                thProcess = fork('./putio-helper.js', [], {silent: false, env: {'HOME': '/tmp'}});
                 thProcess.on('message', function(msg) {
                     if(msg == 'started') {
                         done();
@@ -55,7 +54,7 @@ describe('Torrent Helper Specs\n', function() {
                     wrench.rmdirSyncRecursive(testCustomPath);
                 }
 
-                torrentHelper = rewire('torrent-helper');
+                torrentHelper = rewire('putio-helper');
                 torrentHelper.__set__('config.watchDir', testCustomPath);
                 thProcess = torrentHelper.StartTorrentHelper();
                 done();
@@ -77,7 +76,7 @@ describe('Torrent Helper Specs\n', function() {
         describe('_onFileAdded', function() {
 
             var testCustomPath = '/tmp/test-on-file-added-dir';
-            var sampleFileName = 'sample-file.txt';
+            var sampleFileName = 'sample-file.torrent';
             var sampleFilePath = testCustomPath + '/' + sampleFileName;
             var torrentHelper, thProcess, execChild;
             before(function(done) {
@@ -85,25 +84,33 @@ describe('Torrent Helper Specs\n', function() {
                     wrench.rmdirSyncRecursive(testCustomPath);
                 }
 
-                torrentHelper = rewire('torrent-helper');
+                torrentHelper = rewire('putio-helper');
+                torrentHelper.__set__('FormData.prototype.submit', sinon.spy());
                 torrentHelper.__set__('config.watchDir', testCustomPath);
-                torrentHelper.__set__('_onFileAdded', sinon.spy());
-                thProcess = torrentHelper.StartTorrentHelper();
-                done();
-            });
 
-            it('should be called when a file is added to the watchDir', function(done) {
+                torrentHelper.__set__('_onFileAdded', sinon.spy(torrentHelper.__get__('_onFileAdded')));
+                thProcess = torrentHelper.StartTorrentHelper();
+
                 execChild = exec('touch ' + sampleFilePath,
                     function (error, stdout, stderr) {
                         if (error == null) {
-                            torrentHelper.__get__('_onFileAdded').calledOnce.should.be.true;
-                            torrentHelper.__get__('_onFileAdded').calledWith([sampleFileName]).should.be.true;
                             done();
                         } else {
                             done(new Error('unable to create test file'));
                         }
                     }
                 );
+            });
+
+            it('should be called when a file is added to the watchDir', function(done) {
+                torrentHelper.__get__('_onFileAdded').calledOnce.should.be.true;
+                torrentHelper.__get__('_onFileAdded').calledWith([sampleFileName]).should.be.true;
+                done();
+            });
+
+            it('should call FormData.submit to post the file to Put.io', function(done) {
+                torrentHelper.__get__('form.submit').calledOnce.should.be.true;
+                done();
             });
 
             after(function(done) {
