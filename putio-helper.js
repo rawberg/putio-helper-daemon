@@ -3,15 +3,34 @@
 var DirectoryWatcher = require('directory-watcher'),
     util = require('util'),
     fs = require('fs'),
+    path = require('path'),
+    execFile = require('child_process').execFile,
     wrench = require('wrench'),
     config = require('config'),
     FormData = require('form-data'),
     S = require('string');
 
 var form;
+var rootPath = path.dirname(__filename);
+var osxNotifierPath = path.join(rootPath, '/node_modules/node-osx-notifier/osx/terminal-notifier-info.app/Contents/MacOS/terminal-notifier');
+
+function _onFileUploaded(err, res) {
+    res.setEncoding('utf8');
+    if(err) {
+        console.log(err);
+    } else {
+        res.on('data', function(resData) {
+            var notifyArgs = ["-title", "Put.io Helper", "-subtitle", "Added Torrent to Put.io", "-message", resData.transfer.name];
+            execFile(osxNotifierPath, notifyArgs, function(error, stdout) {
+                if(error) {
+                    console.log(error);
+                }
+            });
+        });
+    }
+};
 
 function _onFileAdded(files) {
-
     files.forEach(function (file, index, files) {
         if(S(file).endsWith('.torrent')) {
             form = new FormData();
@@ -22,10 +41,7 @@ function _onFileAdded(files) {
                 port: '443',
                 hostname: 'api.put.io',
                 path: '/v2/files/upload?oauth_token=' + config.putioToken
-            }, function(err, res) {
-                console.log('error');
-                console.log(util.inspect(err));
-            });
+            }, _onFileUploaded);
         }
     });
 

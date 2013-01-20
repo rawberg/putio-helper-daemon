@@ -31,6 +31,8 @@
         "directory-watcher": "*",
         "wrench": "*",
         "config": "*",
+        "node-osx-notifier": "*",
+        "string": "*",
         "putio": "git://github.com/rawberg/put.io.js-v2.git"
     },
 

@@ -73,22 +73,53 @@ describe('Torrent Helper Specs\n', function() {
             });
         });
 
-        describe('_onFileAdded', function() {
-
+        describe('adding a new file to the watch directory', function() {
             var testCustomPath = '/tmp/test-on-file-added-dir';
             var sampleFileName = 'sample-file.torrent';
             var sampleFilePath = testCustomPath + '/' + sampleFileName;
-            var torrentHelper, thProcess, execChild;
+            var torrentHelper, thProcess, execChild, formSubmitStub, fakeResponse;
+
             before(function(done) {
                 if(fs.existsSync(testCustomPath)) {
                     wrench.rmdirSyncRecursive(testCustomPath);
                 }
 
                 torrentHelper = rewire('putio-helper');
-                torrentHelper.__set__('FormData.prototype.submit', sinon.spy());
+
+                fakeResponse = {
+                    encoding: 'utf8',
+                    headers: {
+                        server: 'nginx',
+                        'content-type': 'application/json',
+                        'content-length': '712',
+                        connection: 'keep-alive',
+                        'keep-alive': 'timeout=60',
+                        status: '200 OK',
+                        srv: 'api'
+                    }
+                };
+
+                fakeResponse.setEncoding = sinon.stub();
+                fakeResponse.on = sinon.stub();
+                fakeResponse.on.yieldsOn(fakeResponse, {
+                    "status": "OK",
+                    "transfer": {
+                        "uploaded": 0,
+                        "status_message": "In queue",
+                        "status": "IN_QUEUE",
+                        "name": sampleFileName
+                    }
+                });
+
+                formSubmitStub = sinon.stub();
+                formSubmitStub.callsArgWith(1, null, fakeResponse);
+
+                torrentHelper.__set__('FormData.prototype.submit', formSubmitStub);
                 torrentHelper.__set__('config.watchDir', testCustomPath);
 
                 torrentHelper.__set__('_onFileAdded', sinon.spy(torrentHelper.__get__('_onFileAdded')));
+                torrentHelper.__set__('_onFileUploaded', sinon.spy(torrentHelper.__get__('_onFileUploaded')));
+                torrentHelper.__set__('execFile', sinon.spy());
                 thProcess = torrentHelper.StartTorrentHelper();
 
                 execChild = exec('touch ' + sampleFilePath,
@@ -102,17 +133,6 @@ describe('Torrent Helper Specs\n', function() {
                 );
             });
 
-            it('should be called when a file is added to the watchDir', function(done) {
-                torrentHelper.__get__('_onFileAdded').calledOnce.should.be.true;
-                torrentHelper.__get__('_onFileAdded').calledWith([sampleFileName]).should.be.true;
-                done();
-            });
-
-            it('should call FormData.submit to post the file to Put.io', function(done) {
-                torrentHelper.__get__('form.submit').calledOnce.should.be.true;
-                done();
-            });
-
             after(function(done) {
                 if(fs.existsSync(testCustomPath)) {
                     wrench.rmdirSyncRecursive(testCustomPath);
@@ -121,6 +141,32 @@ describe('Torrent Helper Specs\n', function() {
                 execChild.kill();
                 done();
             });
+
+            describe('_onFileAdded', function() {
+                it('should be called when a file is added to the watchDir', function(done) {
+                    torrentHelper.__get__('_onFileAdded').calledOnce.should.be.true;
+                    torrentHelper.__get__('_onFileAdded').calledWith([sampleFileName]).should.be.true;
+                    done();
+                });
+
+                it('should call FormData.submit to post the file to Put.io', function(done) {
+                    torrentHelper.__get__('form.submit').calledOnce.should.be.true;
+                    done();
+                });
+            });
+
+            describe('_onFileUploaded', function() {
+                it('should call osx notifier with the message set to the newly added file name', function(done) {
+                    torrentHelper.__get__('_onFileUploaded').calledOnce.should.be.true;
+                    torrentHelper.__get__('execFile').calledOnce.should.be.true;
+
+                    var execFileSpy = torrentHelper.__get__('execFile');
+                    var lastNotifierArg = execFileSpy.lastCall.args[1].length - 1;
+                    execFileSpy.lastCall.args[1][lastNotifierArg].should.eql(sampleFileName);
+                    done();
+                });
+            });
+
         });
 
     });
