@@ -13,7 +13,7 @@ I'm currently using this everyday to handle automatic uploads from OSX to Put.io
     sudo npm install -g
     
 ### Tests
-- written with [Mocha](http://visionmedia.github.com/mocha/) and [Should](https://github.com/visionmedia/should.js/)
+- written with [Mocha](http://visionmedia.github.com/mocha/) and [Should](https://github.com/visionmedia/should.js/)/[Chai](http://chaijs.com/)
 - run them from the root directory via `make test`
 
 ### License
