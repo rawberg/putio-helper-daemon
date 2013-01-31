@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 
-var should = require('should'),
-    util = require('util'),
+var util = require('util'),
     wrench = require('wrench'),
     fs = require('fs'),
+    bunyan = require('bunyan'),
     config = require('config'),
     sinon = require('sinon'),
     rewire = require('rewire'),
     fork = require('child_process').fork,
-    exec = require('child_process').exec;
+    exec = require('child_process').exec,
+    chai = require('chai'),
+    should = chai.should();
+
+
 
 describe('Torrent Helper Specs\n', function() {
 
@@ -77,7 +81,7 @@ describe('Torrent Helper Specs\n', function() {
             var testCustomPath = '/tmp/test-on-file-added-dir';
             var sampleFileName = 'sample-file.torrent';
             var sampleFilePath = testCustomPath + '/' + sampleFileName;
-            var torrentHelper, thProcess, execChild, formSubmitStub, fakeResponse;
+            var torrentHelper, thProcess, execChild, formSubmitStub, fakeResponse, outLogger;
 
             before(function(done) {
                 if(fs.existsSync(testCustomPath)) {
@@ -113,12 +117,15 @@ describe('Torrent Helper Specs\n', function() {
 
                 formSubmitStub = sinon.stub();
                 formSubmitStub.callsArgWith(1, null, fakeResponse);
+                outLogger = torrentHelper.__get__('outLogger');
+                outLogger.info = sinon.stub();
 
                 torrentHelper.__set__('FormData.prototype.submit', formSubmitStub);
                 torrentHelper.__set__('config.watchDir', testCustomPath);
 
                 torrentHelper.__set__('_onFileAdded', sinon.spy(torrentHelper.__get__('_onFileAdded')));
                 torrentHelper.__set__('_onFileUploaded', sinon.spy(torrentHelper.__get__('_onFileUploaded')));
+                torrentHelper.__set__('outLogger', outLogger);
                 torrentHelper.__set__('execFile', sinon.spy());
                 thProcess = torrentHelper.StartTorrentHelper();
 
@@ -156,6 +163,13 @@ describe('Torrent Helper Specs\n', function() {
             });
 
             describe('_onFileUploaded', function() {
+                it('should log a message with the newly added file name', function(done) {
+                    var outLoggerSpy = torrentHelper.__get__('outLogger.info');
+                    outLoggerSpy.calledOnce.should.be.true;
+                    outLoggerSpy.lastCall.args[0].should.have.string(sampleFileName);
+                    done();
+                });
+
                 it('should call osx notifier with the message set to the newly added file name', function(done) {
                     torrentHelper.__get__('_onFileUploaded').calledOnce.should.be.true;
                     torrentHelper.__get__('execFile').calledOnce.should.be.true;

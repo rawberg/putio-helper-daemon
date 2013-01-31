@@ -1,24 +1,25 @@
 {
     "author": "David Feinberg",
-    "name": "putio-helper",
-    "description": "Daemon",
-    "homepage": "https://github.com/rawberg/putio-helper",
+    "name": "putio-helper-daemon",
+    "description": "NodeJS daemon to automatically upload files to Put.io",
+    "homepage": "https://github.com/rawberg/putio-helper-daemon",
     "version": "1.0.0",
     "repository": {
         "type": "git",
-        "url": "git://github.com:rawberg/putio-helper.git"
+        "url": "git://github.com:rawberg/putio-helper-daemon.git"
     },
 
     "bin": {
-        "putio-helper": "./daemon.js"
+        "putio-helper-daemon": "./putio-helper-daemon.js"
     },
 
     "scripts": {
-        "postinstall": "./postinstall.sh"
+        "postinstall": "./postinstall.sh",
+        "postuninstall": "./postuninstall.sh"
     },
 
     "bugs": {
-        "url": "https://github.com/rawberg/putio-helper/issues"
+        "url": "https://github.com/rawberg/putio-helper-daemon/issues"
     },
 
     "engines": {
@@ -33,6 +34,8 @@
         "config": "*",
         "node-osx-notifier": "*",
         "string": "*",
+        "form-data": "*",
+        "bunyan": "*",
         "putio": "git://github.com/rawberg/put.io.js-v2.git"
     },
 
@@ -40,6 +43,7 @@
         "mocha": "*",
         "should": "*",
         "sinon": "*",
+        "chai": "*",
         "rewire": "*"
     },
 

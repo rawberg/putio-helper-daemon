@@ -5,25 +5,42 @@ var DirectoryWatcher = require('directory-watcher'),
     fs = require('fs'),
     path = require('path'),
     execFile = require('child_process').execFile,
+    bunyan = require('bunyan'),
     wrench = require('wrench'),
     config = require('config'),
     FormData = require('form-data'),
     S = require('string');
 
+
 var form;
 var rootPath = path.dirname(__filename);
 var osxNotifierPath = path.join(rootPath, '/node_modules/node-osx-notifier/osx/terminal-notifier-info.app/Contents/MacOS/terminal-notifier');
+var outLogger = bunyan.createLogger({
+    name: 'putio-helper',
+    streams: [{
+        level: 'info',
+        path: 'messages/out.log'
+    }]
+});
+
+var devLogger = bunyan.createLogger({
+    name: 'putio-helper',
+    streams: [{
+        level: 'debug',
+        path: 'messages/dev.log'
+    }]
+});
 
 function _onFileUploaded(err, res) {
-    res.setEncoding('utf8');
     if(err) {
-        console.log(err);
+        devLogger.error(err);
     } else {
         res.on('data', function(resData) {
+            outLogger.info('uploaded ' + resData.transfer.name + ' to Put.io');
             var notifyArgs = ["-title", "Put.io Helper", "-subtitle", "Added Torrent to Put.io", "-message", resData.transfer.name];
-            execFile(osxNotifierPath, notifyArgs, function(error, stdout) {
+            execFile(osxNotifierPath, notifyArgs, function(err, stdout) {
                 if(error) {
-                    console.log(error);
+                    devLogger.error(err);
                 }
             });
         });
@@ -54,7 +71,7 @@ var StartTorrentHelper = function() {
         try {
             wrench.mkdirSyncRecursive(watchDir, 0755);
         } catch(err) {
-            console.log('error (' + err + ') creating directory: ' + watchDir + ' (exiting)');
+            devLogger.error('error (' + err + ') creating directory: ' + watchDir + ' (exiting)');
             process.exit();
         }
     }
