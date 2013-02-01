@@ -1,4 +1,4 @@
-Put.io Helper Daemom
+Put.io Helper Daemon
 ====================
 
 Nodejs daemon for watching a directory and automagically uploading torrent files to Put.io for cloud torrenting.
@@ -10,8 +10,13 @@ I'm currently using this everyday to handle automatic uploads from OSX to Put.io
 ### Install (OSX)
     git clone git@github.com:rawberg/putio-helper-daemon.git putio-helper-daemon
     cd putio-helper-daemon
-    sudo npm install -g
-    
+    npm install -g
+    vi /usr/local/share/npm/lib/node_modules/putio-helper-daemon/config/default.js
+
+### Install Notes
+- don't forget to add your [Put.io oauth token](https://api.put.io/v2/docs/#obtain-access-token) to the default.js config file (see last step of install).
+- eventually I'd like the post install script to handle obtaining the oauth token
+
 ### Tests
 - written with [Mocha](http://visionmedia.github.com/mocha/) and [Should](https://github.com/visionmedia/should.js/)/[Chai](http://chaijs.com/)
 - run them from the root directory via `make test`

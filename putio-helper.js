@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/local/bin/node
 
 var DirectoryWatcher = require('directory-watcher'),
     util = require('util'),
@@ -14,12 +14,13 @@ var DirectoryWatcher = require('directory-watcher'),
 
 var form;
 var rootPath = path.dirname(__filename);
+
 var osxNotifierPath = path.join(rootPath, '/node_modules/node-osx-notifier/osx/terminal-notifier-info.app/Contents/MacOS/terminal-notifier');
 var outLogger = bunyan.createLogger({
     name: 'putio-helper',
     streams: [{
         level: 'info',
-        path: 'messages/out.log'
+        path: rootPath + '/messages/out.log'
     }]
 });
 
@@ -27,9 +28,11 @@ var devLogger = bunyan.createLogger({
     name: 'putio-helper',
     streams: [{
         level: 'debug',
-        path: 'messages/dev.log'
+        path: rootPath + '/messages/dev.log'
     }]
 });
+
+devLogger.error(rootPath);
 
 function _onFileUploaded(err, res) {
     if(err) {

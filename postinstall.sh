@@ -2,16 +2,20 @@
 
 DEFAULT_WATCHDIR="$HOME/Dropbox/torrents"
 DEFAULT_DOWNLOADDIR="$HOME/Videos"
+NPM_PATH=$(npm prefix -g)
 
 if [ ! -d "config" ]; then
     mkdir config
-    chown config $USER:$USER
+fi
+
+if [ ! -d "messages" ]; then
+    mkdir messages
 fi
 
 if [ ! -e "config/default.js" ]; then
   printf "module.exports = {
-    watchDir: $DEFAULT_WATCHDIR,
-    downloadDir: DEFAULT_DOWNLOADDIR,
+    watchDir: \"$DEFAULT_WATCHDIR\",
+    downloadDir: \"$DEFAULT_DOWNLOADDIR\",
     putioToken: \"\"\n}" > config/default.js
 fi
 
@@ -22,10 +26,12 @@ if [ ! -e "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist" 
         <dict>
             <key>Label</key>
             <string>io.daemontools.putio</string>
+            <key>WorkingDirectory</key>
+            <string>'$NPM_PATH'/lib/node_modules/putio-helper-daemon</string>
             <key>ProgramArguments</key>
             <array>
                 <string>/usr/local/bin/node</string>
-                <string>/usr/local/bin/putio-helper-daemon</string>
+                <string>'$NPM_PATH'/bin/putio-helper-daemon</string>
             </array>
             <key>StartInterval</key>
             <integer>3600</integer>
@@ -39,4 +45,4 @@ else
     launchctl unload -w "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist"
 fi
 
-launchctl load -w "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist"
+#launchctl load -w "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist"

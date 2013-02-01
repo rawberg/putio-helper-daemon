@@ -10,12 +10,11 @@
     },
 
     "bin": {
-        "putio-helper-daemon": "./putio-helper-daemon.js"
+        "putio-helper-daemon": "./putio-helper.js"
     },
 
     "scripts": {
-        "postinstall": "./postinstall.sh",
-        "postuninstall": "./postuninstall.sh"
+        "postinstall": "./postinstall.sh"
     },
 
     "bugs": {
