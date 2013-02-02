@@ -45,4 +45,4 @@ else
     launchctl unload -w "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist"
 fi
 
-#launchctl load -w "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist"
+launchctl load -w "$HOME/Library/LaunchAgents/io.daemontools.putio-helper-daemon.plist"

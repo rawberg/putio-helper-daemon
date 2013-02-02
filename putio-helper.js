@@ -32,20 +32,27 @@ var devLogger = bunyan.createLogger({
     }]
 });
 
-devLogger.error(rootPath);
-
 function _onFileUploaded(err, res) {
+    res.setEncoding('utf8');
+    var resChunks = '';
     if(err) {
         devLogger.error(err);
     } else {
         res.on('data', function(resData) {
-            outLogger.info('uploaded ' + resData.transfer.name + ' to Put.io');
-            var notifyArgs = ["-title", "Put.io Helper", "-subtitle", "Added Torrent to Put.io", "-message", resData.transfer.name];
-            execFile(osxNotifierPath, notifyArgs, function(err, stdout) {
-                if(error) {
-                    devLogger.error(err);
-                }
-            });
+            resChunks += resData;
+        });
+
+        res.on('end', function() {
+            var resData = JSON.parse(resChunks);
+            if(resData.transfer && resData.transfer.name) {
+                outLogger.info('uploaded ' + resData.transfer.name + ' to Put.io');
+                var notifyArgs = ["-title", "Put.io Helper", "-subtitle", "Added Torrent to Put.io", "-message", resData.transfer.name];
+                execFile(osxNotifierPath, notifyArgs, function(err, stdout) {
+                    if(err) {
+                        devLogger.error(err);
+                    }
+                });
+            }
         });
     }
 };
