@@ -11,7 +11,7 @@ I'm currently using this everyday to handle automatic uploads from OSX to Put.io
     git clone git@github.com:rawberg/putio-helper-daemon.git putio-helper-daemon
     cd putio-helper-daemon
     npm install -g
-    vi /usr/local/share/npm/lib/node_modules/putio-helper-daemon/config/default.js
+    vi /usr/local/share/npm/lib/node_modules/putio-helper-daemon/config/default.js (add your oauth token)
 
 ### Install Notes
 - don't forget to add your [Put.io oauth token](https://api.put.io/v2/docs/#obtain-access-token) to the default.js config file (see last step of install).
