@@ -43,7 +43,13 @@ function _onFileUploaded(err, res) {
         });
 
         res.on('end', function() {
-            var resData = JSON.parse(resChunks);
+            var resData;
+            try {
+                resData = JSON.parse(resChunks);
+            } catch(e) {
+                resData = {};
+            }
+
             if(resData.transfer && resData.transfer.name) {
                 outLogger.info('uploaded ' + resData.transfer.name + ' to Put.io');
                 var notifyArgs = ["-title", "Put.io Helper", "-subtitle", "Added Torrent to Put.io", "-message", resData.transfer.name];

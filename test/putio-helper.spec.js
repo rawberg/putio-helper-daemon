@@ -105,15 +105,15 @@ describe('Torrent Helper Specs\n', function() {
 
                 fakeResponse.setEncoding = sinon.stub();
                 fakeResponse.on = sinon.stub();
-                fakeResponse.on.yieldsOn(fakeResponse, {
-                    "status": "OK",
-                    "transfer": {
-                        "uploaded": 0,
-                        "status_message": "In queue",
-                        "status": "IN_QUEUE",
-                        "name": sampleFileName
-                    }
-                });
+                fakeResponse.on.yieldsOn(fakeResponse, '{\n\
+                    "status": "OK",\n\
+                    "transfer": {\n\
+                        "uploaded": 0,\n\
+                        "status_message": "In queue",\n\
+                        "status": "IN_QUEUE",\n\
+                        "name": "' + sampleFileName + '"\n\
+                    }\n\
+                }');
 
                 formSubmitStub = sinon.stub();
                 formSubmitStub.callsArgWith(1, null, fakeResponse);
