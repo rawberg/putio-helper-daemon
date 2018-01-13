@@ -18,7 +18,7 @@ I'm currently using this everyday to handle automatic uploads from OSX to Put.io
 - eventually I'd like the post install script to handle obtaining the oauth token
 
 ### Tests
-- written with [Mocha](http://visionmedia.github.com/mocha/) and [Should](https://github.com/visionmedia/should.js/)/[Chai](http://chaijs.com/)
+- written with [Mocha](http://mochajs.org/) and [Should](https://github.com/visionmedia/should.js/)/[Chai](http://chaijs.com/)
 - run them from the root directory via `make test`
 
 ### License
